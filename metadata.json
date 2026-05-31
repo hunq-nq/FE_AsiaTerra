@@ -1,0 +1,6 @@
+{
+  "name": "AsiaTerra Travel",
+  "description": "Tourist website specializing in curated experiences across Southeast Asian landscapes like Vietnam, Cambodia, Thailand, and Laos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
