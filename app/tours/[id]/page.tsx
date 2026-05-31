@@ -4,7 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import { getTourById, Tour } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import Image from 'next/image';
-import { MapPin, Clock, Star, Users, CheckCircle, ChevronRight, Share, Heart, Calendar, Globe, XCircle, Info, Pencil, X } from 'lucide-react';
+import { MapPin, Clock, Star, Users, CheckCircle, ChevronRight, Share, Heart, Calendar, Globe, XCircle, Info, Pencil, X, Plus, Minus } from 'lucide-react';
 import Link from 'next/link';
 
 export default function TourDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -14,6 +14,14 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const faqs = [
+    { question: 'Can I get the refund?', answer: 'For a full refund, you must cancel at least 24 hours before the experience\'s start time. If you cancel less than 24 hours before the experience\'s start time, the amount you paid will not be refunded.' },
+    { question: 'Can I change the travel date?', answer: 'Yes, you can request a date change up to 48 hours before the tour start time. Changes are subject to availability and may incur a small administrative fee.' },
+    { question: 'When and where does the tour end?', answer: 'Phang Nga Bay Sea Cave Canoeing & James Bond Island w/ Buffet Lunch by Big Boat cancellation policy: For a full refund, cancel at least 24 hours in advance of the start date of the experience. Discover and book Phang Nga Bay Sea Cave Canoeing & James Bond Island w/ Buffet Lunch by Big Boat' },
+    { question: 'Do you arrange airport transfers?', answer: 'Yes, airport transfers can be arranged as an add-on during the booking process or requested directly from our customer support team after booking.' }
+  ];
 
   const galleryImages = tour ? [
     tour.image.replace('800/600', '1000/800'),
@@ -149,7 +157,7 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
         <div className="flex flex-col lg:flex-row gap-12">
           
           {/* Left Column (Content) */}
-          <div className="w-full lg:w-2/3">
+          <div className="w-full">
             
             {/* Tour Snapshot Bar */}
             <div className="flex items-center gap-6 py-6 border-y border-border mb-8 overflow-x-auto">
@@ -279,6 +287,36 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
 
             <div className="w-full h-px bg-border mb-12"></div>
 
+            {/* FAQ */}
+            <section className="mb-12">
+              <h2 className="font-serif text-3xl font-bold mb-8 text-[#0a1835]">FAQ</h2>
+              <div className="space-y-4">
+                {faqs.map((faq, index) => (
+                  <div key={index} className="border border-border rounded-xl bg-white overflow-hidden transition-all duration-300">
+                    <button
+                      type="button"
+                      className="w-full px-6 py-5 flex items-center justify-between bg-white text-left focus:outline-none"
+                      onClick={() => setOpenFaq(openFaq === index ? null : index)}
+                    >
+                      <span className="font-medium text-[#0a1835] pr-8">{faq.question}</span>
+                      <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center transition-colors duration-300 ${
+                        openFaq === index ? 'bg-[#e2643a] text-white' : 'bg-[#fff5ee] text-[#e2643a]'
+                      }`}>
+                        {openFaq === index ? <Minus className="w-5 h-5" /> : <Plus className="w-5 h-5" />}
+                      </div>
+                    </button>
+                    {openFaq === index && (
+                      <div className="px-6 pb-6 pt-2">
+                        <p className="text-gray-600 leading-relaxed text-[15px]">{faq.answer}</p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </section>
+
+            <div className="w-full h-px bg-border mb-12"></div>
+
             {/* Personalize this tour */}
             <section className="mb-12">
               <div className="text-center mb-10">
@@ -397,44 +435,6 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
               </form>
             </section>
           </div>
-
-          {/* Right Column (Sidebar) */}
-          <div className="w-full lg:w-1/3">
-            <div className="bg-card-bg p-6 rounded-2xl border border-border sticky top-24 shadow-sm">
-              <div className="flex items-end gap-2 mb-6">
-                <span className="text-3xl font-bold text-primary">${tour.price}</span>
-                <span className="text-sm font-normal text-gray-500 mb-1">/ person</span>
-              </div>
-              
-              <div className="flex flex-col gap-4 mb-6">
-                <div className="border border-border rounded-lg overflow-hidden flex flex-col">
-                  <div className="p-3 border-b border-border hover:bg-gray-50 transition-colors cursor-pointer relative">
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">Date</label>
-                    <div className="flex items-center justify-between text-gray-900 font-medium text-sm">
-                      Select tour date
-                      <Calendar className="w-4 h-4 text-gray-400" />
-                    </div>
-                  </div>
-                  <div className="p-3 hover:bg-gray-50 transition-colors cursor-pointer relative">
-                    <label className="block text-[11px] font-bold text-gray-500 uppercase tracking-wide mb-1">Travelers</label>
-                    <div className="flex items-center justify-between text-gray-900 font-medium text-sm">
-                      2 Adults
-                      <Users className="w-4 h-4 text-gray-400" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <button className="w-full bg-primary text-white py-3.5 rounded-lg font-bold text-sm hover:bg-primary-hover transition-colors shadow-none mb-4">
-                {dict.tours.book_now}
-              </button>
-              
-              <div className="flex items-center justify-center gap-2 text-sm text-green-700 bg-green-50 px-4 py-2.5 rounded-lg border border-green-100 font-medium">
-                <Info className="w-4 h-4 fill-green-600 text-white" /> Free cancellation up to 48h
-              </div>
-            </div>
-          </div>
-
         </div>
       </div>
       {lightboxOpen && (
