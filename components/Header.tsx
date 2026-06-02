@@ -6,6 +6,7 @@ import { useLanguage } from '@/lib/i18n/LanguageContext';
 import { Compass, Globe, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
+import Image from 'next/image';
 
 export default function Header() {
   const { language, setLanguage, dict } = useLanguage();
@@ -26,8 +27,15 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border bg-card-bg/90 backdrop-blur-md">
       <div className="container mx-auto px-4 lg:px-10 h-[72px] flex items-center justify-between">
-        <Link href="/" className="flex items-center text-primary font-bold text-2xl tracking-tight">
-          <span>AsiaTerra <span className="font-serif italic font-normal text-gray-500">Travel</span></span>
+        <Link href="/" className="flex flex-col justify-center">
+          <Image 
+            src="/logo.png" 
+            alt="AsiaTerra Travel Logo" 
+            width={160} 
+            height={60} 
+            className="object-contain h-12 w-auto"
+            referrerPolicy="no-referrer"
+          />
         </Link>
 
         {/* Desktop Nav */}

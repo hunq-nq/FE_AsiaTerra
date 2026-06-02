@@ -4,8 +4,9 @@ import React, { useState, useEffect, use } from 'react';
 import { getTourById, Tour } from '@/lib/api';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 import Image from 'next/image';
-import { MapPin, Clock, Star, Users, CheckCircle, ChevronRight, Share, Heart, Calendar, Globe, XCircle, Info, Pencil, X, Plus, Minus } from 'lucide-react';
+import { MapPin, Clock, Star, Users, CheckCircle, ChevronRight, Share, Heart, Calendar, Globe, XCircle, Info, Pencil, X, Plus, Minus, Flag } from 'lucide-react';
 import Link from 'next/link';
+import useEmblaCarousel from 'embla-carousel-react';
 
 export default function TourDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = use(params);
@@ -14,7 +15,10 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
   const [loading, setLoading] = useState(true);
   const [lightboxOpen, setLightboxOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [openItineraryDay, setOpenItineraryDay] = useState<number>(1);
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+  
+  const [emblaRef] = useEmblaCarousel({ loop: false });
 
   const faqs = [
     { question: 'Can I get the refund?', answer: 'For a full refund, you must cancel at least 24 hours before the experience\'s start time. If you cancel less than 24 hours before the experience\'s start time, the amount you paid will not be refunded.' },
@@ -105,10 +109,32 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
         </div>
       </div>
 
-      {/* Gallery Grid */}
-      <div className="container mx-auto px-4 max-w-7xl mb-12">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 md:h-[450px] rounded-2xl overflow-hidden">
-          <div className="md:col-span-2 relative h-[250px] md:h-full group cursor-pointer" onClick={() => openLightbox(0)}>
+      {/* Mobile Gallery (Embla Carousel) */}
+      <div className="md:hidden w-full overflow-hidden mb-6" ref={emblaRef}>
+        <div className="flex gap-2 px-4 touch-pan-y">
+          {galleryImages.map((src, idx) => (
+            <div key={idx} className="relative flex-[0_0_85vw] h-[250px] rounded-xl overflow-hidden shadow-sm cursor-pointer" onClick={() => openLightbox(idx)}>
+              <Image
+                src={src}
+                alt={`${tour.title} - Image ${idx + 1}`}
+                fill
+                className="object-cover"
+                referrerPolicy="no-referrer"
+              />
+              {idx === 0 && (
+                <div className="absolute bottom-3 right-3 bg-[#08053a] text-white px-5 py-2 rounded-2xl font-bold text-[15px] shadow-xl z-10">
+                  See all photos
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Desktop Gallery Grid */}
+      <div className="hidden md:block container mx-auto px-4 max-w-7xl mb-12">
+        <div className="grid grid-cols-4 gap-2 h-[450px] rounded-2xl overflow-hidden">
+          <div className="col-span-2 relative h-full group cursor-pointer" onClick={() => openLightbox(0)}>
             <Image 
               src={tour.image.replace('800/600', '1000/800')} 
               alt={tour.title} 
@@ -117,7 +143,7 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
               referrerPolicy="no-referrer"
             />
           </div>
-          <div className="hidden md:block relative h-full group cursor-pointer" onClick={() => openLightbox(1)}>
+          <div className="relative h-full group cursor-pointer" onClick={() => openLightbox(1)}>
             <Image 
               src={`https://images.unsplash.com/photo-1504215680853-026ed2a45def?auto=format&fit=crop&w=600&h=800`} 
               alt={tour.title} 
@@ -126,7 +152,7 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
               referrerPolicy="no-referrer"
             />
           </div>
-          <div className="hidden md:flex flex-col gap-2 h-full">
+          <div className="flex flex-col gap-2 h-full">
             <div className="relative h-1/2 group cursor-pointer overflow-hidden" onClick={() => openLightbox(2)}>
               <Image 
                 src={`https://images.unsplash.com/photo-1526481280693-3bfa7568e0f3?auto=format&fit=crop&w=600&h=400`} 
@@ -144,7 +170,7 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
                 className="object-cover group-hover:scale-105 transition-transform duration-500" 
                 referrerPolicy="no-referrer"
               />
-              <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
+              <div className="absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity hover:bg-black/50">
                 <span className="text-white font-bold text-lg border-2 border-white px-4 py-2 rounded-lg">See All Photos</span>
               </div>
             </div>
@@ -254,6 +280,28 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
 
             <div className="w-full h-px bg-border mb-12"></div>
 
+            {/* Route in Brief */}
+            <section className="mb-12">
+              <h2 className="font-serif text-3xl font-bold mb-8 text-gray-900">Route in brief</h2>
+              <div className="bg-gray-50 p-6 rounded-xl border border-gray-100">
+                <ul className="space-y-4">
+                  {[
+                    { day: 1, title: 'Airport Pick Up' },
+                    { day: 2, title: 'Temples & River Cruise' },
+                    { day: 3, title: 'Massage & Overnight Train' },
+                    { day: 4, title: 'Khao Sok National Park' }
+                  ].map((item) => (
+                    <li key={item.day} className="flex gap-4 items-center">
+                      <div className="w-20 font-bold text-primary">Day {item.day}</div>
+                      <div className="flex-1 font-medium text-gray-900">{item.title}</div>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </section>
+
+            <div className="w-full h-px bg-border mb-12"></div>
+
             {/* Itinerary */}
              <section className="mb-12">
               <h2 className="font-serif text-3xl font-bold mb-8 text-gray-900">Itinerary</h2>
@@ -263,18 +311,39 @@ export default function TourDetailPage({ params }: { params: Promise<{ id: strin
                    { day: 2, title: 'Temples & River Cruise', content: 'After breakfast, we will head out to explore the ancient temples. You will learn about the rich history and architecture. In the evening, enjoy a relaxing river cruise with dinner.' },
                    { day: 3, title: 'Massage & Overnight Train', content: 'Start your day with a traditional massage. Later, we will board the overnight train to our next destination, a fun and unique way to travel like a local.' },
                    { day: 4, title: 'Khao Sok National Park', content: 'Arrive early and head into the lush jungle. We will take a boat ride on the lake and stay in floating bungalows surrounded by breathtaking limestone karsts.' }
-                 ].map((item, index) => (
+                 ].map((item, index, arr) => (
                    <div key={item.day} className="relative pl-8">
                      {index === 0 ? (
                        <div className="absolute -left-[20px] top-0 bg-primary text-white w-10 h-10 rounded-full flex items-center justify-center shadow-[0_0_0_4px_var(--color-bg)] z-10">
                          <MapPin className="w-5 h-5 fill-current" />
                        </div>
+                     ) : index === arr.length - 1 ? (
+                       <div className="absolute -left-[20px] top-0 bg-[#e2643a] text-white w-10 h-10 rounded-full flex items-center justify-center shadow-[0_0_0_4px_var(--color-bg)] z-10">
+                         <Flag className="w-5 h-5 fill-current" />
+                       </div>
                      ) : (
                        <div className="absolute -left-[7px] top-1.5 bg-primary w-3.5 h-3.5 rounded-full shadow-[0_0_0_4px_var(--color-bg)] z-10"></div>
                      )}
                      <div className="mt-1">
-                       <h4 className="font-semibold text-gray-900 text-lg mb-2">Day {item.day}: {item.title}</h4>
-                       <p className="text-gray-600 leading-relaxed text-sm md:text-base pr-4">{item.content}</p>
+                       <button
+                         type="button"
+                         onClick={() => setOpenItineraryDay(openItineraryDay === item.day ? 0 : item.day)}
+                         className="w-full text-left focus:outline-none flex justify-between items-center mb-2"
+                       >
+                         <h4 className={`font-semibold text-lg transition-colors ${openItineraryDay === item.day ? 'text-primary' : 'text-gray-900 group-hover:text-primary'}`}>
+                           Day {item.day}: {item.title}
+                         </h4>
+                         {openItineraryDay === item.day ? (
+                           <Minus className="w-5 h-5 text-gray-400" />
+                         ) : (
+                           <Plus className="w-5 h-5 text-gray-400" />
+                         )}
+                       </button>
+                       {openItineraryDay === item.day && (
+                         <div className="animate-in slide-in-from-top-4 fade-in duration-300">
+                           <p className="text-gray-600 leading-relaxed text-sm md:text-base pr-4">{item.content}</p>
+                         </div>
+                       )}
                      </div>
                    </div>
                  ))}

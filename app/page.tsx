@@ -1,7 +1,8 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
-import { mockTours } from '@/lib/api';
+import { getTours, Tour } from '@/lib/api';
 import TourCard from '@/components/TourCard';
 import { MapPin, Search, Star } from 'lucide-react';
 import Image from 'next/image';
@@ -10,9 +11,15 @@ import Link from 'next/link';
 
 export default function Home() {
   const { dict } = useLanguage();
-  
-  // Featured tours (first 3)
-  const featuredTours = mockTours.slice(0, 3);
+  const [featuredTours, setFeaturedTours] = useState<Tour[]>([]);
+
+  useEffect(() => {
+    async function load() {
+      const data = await getTours();
+      setFeaturedTours(data.slice(0, 3));
+    }
+    load();
+  }, []);
   
   const destinations = [
     { name: 'Vietnam', image: 'https://images.unsplash.com/photo-1555661530-68c8e98db4e6?auto=format&fit=crop&w=600&h=800' },

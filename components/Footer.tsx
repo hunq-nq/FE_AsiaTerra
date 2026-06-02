@@ -8,9 +8,8 @@ export default function Footer() {
     <footer className="bg-gray-900 justify-end text-gray-300 py-12 mt-16">
       <div className="container mx-auto px-4 grid grid-cols-1 md:grid-cols-4 gap-8">
         <div className="col-span-1 md:col-span-2">
-          <div className="flex items-center gap-2 text-white font-bold text-xl mb-4">
-            <Compass className="w-6 h-6 text-primary" />
-            <span>AsiaTerra</span>
+          <div className="flex items-center text-white font-bold text-2xl tracking-tight mb-4">
+            <span>AsiaTerra <span className="font-serif italic font-normal text-gray-400">Travel</span></span>
           </div>
           <p className="text-sm max-w-sm mb-6 text-gray-400">
             {dict.hero.subtitle}
